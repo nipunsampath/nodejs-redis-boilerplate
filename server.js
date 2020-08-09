@@ -9,11 +9,13 @@ const app = express();
 
 // setup redis client
 
-const client = redis.createClient({
-  port: process.env.REDIS_PORT,
-  host: process.env.REDIS_HOST,
-  password: process.env.REDIS_PASSWORD,
-});
+const client = redis.createClient(
+  process.env.REDIS_PORT,
+  process.env.REDIS_HOST, {
+  auth_pass: process.env.REDIS_PASSWORD,
+  tls: { servername: process.env.REDIS_HOST },
+}
+);
 
 // redis store configs
 const usersRedisKey = "store:users"; // cahce key for users
