@@ -18,7 +18,7 @@ const client = redis.createClient(
 );
 
 // redis store configs
-const usersRedisKey = "store:users"; // cahce key for users
+const employeeRedisKey = "store:employees"; // cahce key for employeees
 const dataExpireTime = 3600; // 1 hour cache expire time
 
 // main endpoint
@@ -26,12 +26,12 @@ app.get("/", (req, res) =>
   res.send("Welcome to Node.js + redis boilerplate API.")
 );
 
-// users endpoint with caching
-app.get("/users", (req, res) => {
+// employee endpoint with caching
+app.get("/employees", (req, res) => {
   // try to fetch the result from redis
-  return client.get(usersRedisKey, (err, users) => {
-    if (users) {
-      return res.json({ source: "cache", data: JSON.parse(users) });
+  return client.get(employeeRedisKey, (err, employees) => {
+    if (employees) {
+      return res.json({ source: "cache", data: JSON.parse(employees) });
 
       // if cache not available call API
     } else {
@@ -41,7 +41,7 @@ app.get("/users", (req, res) => {
         .then((res) => res.data)
         .then((users) => {
           // save the API response in redis store
-          client.setex(usersRedisKey, 3600, JSON.stringify(users));
+          client.setex(employeeRedisKey, 3600, JSON.stringify(users));
 
           // send JSON response to client
           return res.json({ source: "api", data: users });
