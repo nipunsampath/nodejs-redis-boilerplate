@@ -19,7 +19,7 @@ const client = redis.createClient(
 
 // redis store configs
 const employeeRedisKey = "store:employees"; // cahce key for employeees
-const dataExpireTime = 3600; // 1 hour cache expire time
+const dataExpireTime = 300; // 1 hour cache expire time
 
 // main endpoint
 app.get("/", (req, res) =>
@@ -41,7 +41,7 @@ app.get("/employees", (req, res) => {
         .then((res) => res.data)
         .then((users) => {
           // save the API response in redis store
-          client.setex(employeeRedisKey, 3600, JSON.stringify(users));
+          client.setex(employeeRedisKey, 300, JSON.stringify(users));
 
           // send JSON response to client
           return res.json({ source: "api", data: users });
