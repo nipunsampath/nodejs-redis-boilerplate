@@ -15,7 +15,7 @@ const client = redis.createClient(
   process.env.REDIS_PORT,
   process.env.REDIS_HOST, {
   auth_pass: process.env.REDIS_PASSWORD,
-  // tls: { servername: process.env.REDIS_HOST },
+  tls: { servername: process.env.REDIS_HOST },
 }
 );
 
