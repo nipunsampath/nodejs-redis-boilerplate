@@ -63,11 +63,11 @@ app.get("/employees", (req, res) => {
 });
 
 // save user endpoint
-app.post("/saveEmployee", async (req, res) => {
+app.post("/saveEmployee", (req, res) => {
   
   let sampleFile = req.files.sampleFile;
   console.log(sampleFile.name);
-  
+  console.log("request recieved");
   const employeeData = {
     'fname':req.body.fname,
     'lname':req.body.lname,
