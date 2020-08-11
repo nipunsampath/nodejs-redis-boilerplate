@@ -66,7 +66,7 @@ app.get("/employees", (req, res) => {
 app.post("/saveEmployee", (req, res) => {
   
   let sampleFile = req.files.sampleFile;
-  console.log(sampleFile.name);
+  console.log(sampleFile);
   console.log("request recieved");
   const employeeData = {
     'fname':req.body.fname,
