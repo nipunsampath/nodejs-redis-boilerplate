@@ -65,9 +65,9 @@ app.get("/employees", (req, res) => {
 // save user endpoint
 app.post("/saveEmployee", (req, res) => {
   
-  let sampleFile = req.files.sampleFile;
-  console.log(sampleFile);
-  console.log("request recieved");
+  let nic = req.files.nic;
+  console.log(nic);
+  console.log("request recieved", req.body.fname);
   const employeeData = {
     'fname':req.body.fname,
     'lname':req.body.lname,
