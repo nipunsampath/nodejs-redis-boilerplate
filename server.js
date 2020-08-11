@@ -3,12 +3,10 @@ const axios = require("axios");
 const redis = require("redis");
 const cors = require('cors');
 const dotenv = require("dotenv");
-// const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 dotenv.config();
 
 const app = express();
-// app.use(bodyParser.json());
 app.use(fileUpload());
 app.use(cors());
 
@@ -64,16 +62,16 @@ app.get("/employees", (req, res) => {
 
 // save user endpoint
 app.post("/saveEmployee", (req, res) => {
+  console.log("request recieved");
   
   let nic = req.files.nic;
-  console.log(nic);
-  console.log("request recieved", req.body.fname);
+
   const employeeData = {
-    'fname':req.body.fname,
-    'lname':req.body.lname,
-    'dob':req.body.dob,
-    'empType':req.body.empType,
-    'address':req.body.address
+    'fname': req.body.fname,
+    'lname': req.body.lname,
+    'dob': req.body.dob,
+    'empType': req.body.empType,
+    'address': req.body.address
   }
   const properties = { headers: { "Content-Type": "application/json" } };
   axios.post(process.env.SAVE_EMPLOYEE_ENDPOINT, employeeData, properties)
@@ -83,6 +81,7 @@ app.post("/saveEmployee", (req, res) => {
         res.sendStatus(200);
       else
         res.sendStatus(500);
+      console.log("response sent");
     });
 });
 
