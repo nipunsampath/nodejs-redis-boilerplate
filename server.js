@@ -15,7 +15,7 @@ const client = redis.createClient(
   process.env.REDIS_PORT,
   process.env.REDIS_HOST, {
   auth_pass: process.env.REDIS_PASSWORD,
-  tls: { servername: process.env.REDIS_HOST },
+  // tls: { servername: process.env.REDIS_HOST },
 }
 );
 
@@ -29,8 +29,8 @@ app.get("/", (req, res) =>
 );
 
 // get employee endpoint with caching
-app.get("/employees", async (req, res) => {
-  return client.get(employeeRedisKey, async (err, employees) => {
+app.get("/employees", (req, res) => {
+  return client.get(employeeRedisKey, (err, employees) => {
     console.log("here");
     if (!err) {
       if (employees) {
@@ -38,7 +38,7 @@ app.get("/employees", async (req, res) => {
         return res.json({ source: "cache", data: JSON.parse(employees) });
       } else {
         // get data from remote API
-        const res = await axios.get(process.env.GET_EMPLOYEE_ENDPOINT)
+        axios.get(process.env.GET_EMPLOYEE_ENDPOINT)
           .then((res) => res.data)
           .then((employees) => {
             // save the API response in redis store
