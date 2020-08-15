@@ -85,9 +85,10 @@ app.post("/saveEmployee", async (req, res) => {
       client.get(employeeRedisKey, (err, employees) => {
         if (!err) {
           if (employees) {
-            employees = JSON.parse(employees).push(newEmployee);
-            client.setex(employeeRedisKey, dataExpireTime, JSON.stringify(employees));
-            console.log('redis cache updated',JSON.stringify(employees));
+            empCache = JSON.parse(employees);
+            empCache.push(newEmployee);
+            client.setex(employeeRedisKey, dataExpireTime, JSON.stringify(empCache));
+            console.log('redis cache updated',JSON.stringify(empCache));
           }
         }
         else {
