@@ -81,13 +81,26 @@ app.post("/saveEmployee", async (req, res) => {
       dbInsertionStatus = result.status;
       newEmployee = result.data;
       console.log(newEmployee);
+
+      //updating the redis cache
+      client.get(employeeRedisKey, (err, employees) => {
+        if (!err) {
+          if (employees) {
+            employees = JSON.parse(employees).push(newEmployee)
+            client.setex(employeeRedisKey, dataExpireTime, JSON.stringify(employees));
+          }
+        }
+        else {
+          console.log(err);
+        }
+
+      });
     })
     .catch((error) => {
       dbInsertionStatus = error.status;
     });
 
-    console.log("Uploading nic to azure blob storage");
-
+  console.log("Uploading nic to azure blob storage");
   axios.post("https://handle-nic-upload.azurewebsites.net/api/uploadFile", {
     filedata: nic.data,
     filename: newEmployee.id,
@@ -107,7 +120,6 @@ app.post("/saveEmployee", async (req, res) => {
     console.log("response sent");
   }).catch((error) => {
     // send error to the client
-
     console.log(error);
     return res.json(error.toString());
 
