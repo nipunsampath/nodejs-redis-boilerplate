@@ -65,23 +65,8 @@ app.post("/saveEmployee", async (req, res) => {
   console.log("request recieved");
 
   let nic = req.files.nic;
-  let fileUploadStatus = null;
-
-  console.log("Uploading nic to azure blob storage");
-  try {
-    await axios.post("https://handle-nic-upload.azurewebsites.net/api/uploadFile", {
-      filedata: nic.data,
-      filename: nic.name,
-    }).then((result) => {
-      fileUploadStatus = result.status;
-
-    });
-  }
-  catch (error) {
-    console.log(error);
-    fileUploadStatus = error.status;
-    return;
-  }
+  let dbInsertionStatus = null;
+  let newEmployee = null;
 
   const employeeData = {
     'fname': req.body.fname,
@@ -91,24 +76,44 @@ app.post("/saveEmployee", async (req, res) => {
     'address': req.body.address
   }
   const properties = { headers: { "Content-Type": "application/json" } };
-  try {
-    axios.post(process.env.SAVE_EMPLOYEE_ENDPOINT, employeeData, properties)
-      .then((result) => {
 
-        if (result.status === 200) {
-          if (fileUploadStatus === 200)
-            res.sendStatus(200);
-          else
-            res.sendStatus(207);
-        }
-        else
-          res.sendStatus(500);
-        console.log("response sent");
-      });
-  }
-  catch(error){
+  await axios.post(process.env.SAVE_EMPLOYEE_ENDPOINT, employeeData, properties)
+    .then((result) => {
+      dbInsertionStatus = result.status;
+      newEmployee = result.JSON;
+      console.log(newEmployee);
+    })
+    .catch((error) => {
+      dbInsertionStatus = error.status;
+    });
+
+    console.log("Uploading nic to azure blob storage");
+
+  axios.post("https://handle-nic-upload.azurewebsites.net/api/uploadFile", {
+    filedata: nic.data,
+    filename: newEmployee.id,
+  }).then((result) => {
+
+    if (result.status === 200 && dbInsertionStatus === 200) {
+      res.status(200).json({ "message": "Employee saved successfully!" });
+    }
+    else if (dbInsertionStatus === 200) {
+      res.status(207).json({ "message": "NIC upload failed!" });
+    }
+    else if (result.status === 200) {
+      res.status(207).json({ "message": "DB insertion failed!" });
+    }
+    else
+      res.sendStatus(500);
+    console.log("response sent");
+  }).catch((error) => {
+    // send error to the client
+
     console.log(error);
-  }
+    return res.json(error.toString());
+
+  });
+
 });
 
 
