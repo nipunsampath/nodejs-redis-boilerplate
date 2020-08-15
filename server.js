@@ -31,7 +31,6 @@ app.get("/", (req, res) =>
 // get employee endpoint with caching
 app.get("/employees", (req, res) => {
   return client.get(employeeRedisKey, (err, employees) => {
-    console.log("here");
     if (!err) {
       if (employees) {
         // try to fetch the result from redis
@@ -80,7 +79,7 @@ app.post("/saveEmployee", async (req, res) => {
   await axios.post(process.env.SAVE_EMPLOYEE_ENDPOINT, employeeData, properties)
     .then((result) => {
       dbInsertionStatus = result.status;
-      newEmployee = result.JSON;
+      newEmployee = result.data;
       console.log(newEmployee);
     })
     .catch((error) => {
