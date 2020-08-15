@@ -69,7 +69,7 @@ app.post("/saveEmployee", async (req, res) => {
 
   console.log("Uploading nic to azure blob storage");
   try {
-    await axios.post("https://handle-file-upload.azurewebsites.net/api/uploadFile", {
+    await axios.post("https://handle-nic-upload.azurewebsites.net/api/uploadFile", {
       filedata: nic.data,
       filename: nic.name,
     }).then((result) => {
@@ -80,6 +80,7 @@ app.post("/saveEmployee", async (req, res) => {
   catch (error) {
     console.log(error);
     fileUploadStatus = error.status;
+    return;
   }
 
   const employeeData = {
