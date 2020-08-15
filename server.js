@@ -85,6 +85,8 @@ app.post("/saveEmployee", async (req, res) => {
       client.get(employeeRedisKey, (err, employees) => {
         if (!err) {
           if (employees) {
+            //splitting timestamp at T to get date
+            newEmployee['DOB'] = newEmployee['DOB'].split("T")[0];
             empCache = JSON.parse(employees);
             empCache.push(newEmployee);
             client.setex(employeeRedisKey, dataExpireTime, JSON.stringify(empCache));
