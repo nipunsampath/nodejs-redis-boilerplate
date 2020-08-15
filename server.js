@@ -80,14 +80,14 @@ app.post("/saveEmployee", async (req, res) => {
     .then((result) => {
       dbInsertionStatus = result.status;
       newEmployee = result.data;
-      console.log(newEmployee);
 
       //updating the redis cache
       client.get(employeeRedisKey, (err, employees) => {
         if (!err) {
           if (employees) {
-            employees = JSON.parse(employees).push(newEmployee)
+            employees = JSON.parse(employees).push(newEmployee);
             client.setex(employeeRedisKey, dataExpireTime, JSON.stringify(employees));
+            console.log('redis cache updated',JSON.stringify(employees));
           }
         }
         else {
