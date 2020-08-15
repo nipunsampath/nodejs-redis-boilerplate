@@ -61,10 +61,26 @@ app.get("/employees", (req, res) => {
 });
 
 // save user endpoint
-app.post("/saveEmployee", (req, res) => {
+app.post("/saveEmployee", async (req, res) => {
   console.log("request recieved");
-  
+
   let nic = req.files.nic;
+  let fileUploadStatus = null;
+
+  console.log("Uploading nic to azure blob storage");
+  try {
+    await axios.post("https://handle-file-upload.azurewebsites.net/api/uploadFile", {
+      filedata: req.file.data,
+      filename: nic.name,
+    }).then((result) => {
+      fileUploadStatus = result.status;
+
+    });
+  }
+  catch (error) {
+    console.log(error);
+    fileUploadStatus = error.status;
+  }
 
   const employeeData = {
     'fname': req.body.fname,
@@ -74,16 +90,26 @@ app.post("/saveEmployee", (req, res) => {
     'address': req.body.address
   }
   const properties = { headers: { "Content-Type": "application/json" } };
-  axios.post(process.env.SAVE_EMPLOYEE_ENDPOINT, employeeData, properties)
-    .then((result) => {
+  try {
+    axios.post(process.env.SAVE_EMPLOYEE_ENDPOINT, employeeData, properties)
+      .then((result) => {
 
-      if (result.status === 200)
-        res.sendStatus(200);
-      else
-        res.sendStatus(500);
-      console.log("response sent");
-    });
+        if (result.status === 200) {
+          if (fileUploadStatus === 200)
+            res.sendStatus(200);
+          else
+            res.sendStatus(207);
+        }
+        else
+          res.sendStatus(500);
+        console.log("response sent");
+      });
+  }
+  catch(error){
+    console.log(error);
+  }
 });
+
 
 
 
